@@ -1,0 +1,281 @@
+TIC-TAC-TOE
+
+Tic-Tac-Toe isn't very hard to incorporate. Nevertheless, it does help one make use of some of the algorithms that one had learned before.
+You have to come up with the logic for selecting the winner at the same time, continuously changing players when one player has played their move.
+Use the socket library to turn the game into a multiplayer game, and it can ve played over the internet by two players.
+Source Code: This code divided into three class 
+1-Board 
+2-Player
+3-TicTacToe
+#Board 
+package TicTac;
+
+public class Board {
+	private char board[][];
+	private char p1symbol,p2symbol;
+	private int count;
+	private int boardSize=3;
+	public final static int PLAYER_1_WINS=1;
+	public final static int PLAYER_2_WINS=2;
+	public final static int DRAW=3;
+	public final static int INCOMPLETE=4;
+	public final static int INVALID=5;
+	public Board(char p1symbol,char p2symbol) {
+		board=new char[boardSize][boardSize];
+		for(int i=0;i<boardSize;i++) {
+			for(int j=0;j<boardSize;j++) {
+				board[i][j]=' ';
+			}
+		}
+		this.p1symbol=p1symbol;
+		this.p2symbol=p2symbol;
+	}
+	public int move(char symbol, int x, int y) {
+		if(x<0 || x>=boardSize || y<0||y>=boardSize|| board[x][y]!=' ') {
+			return INVALID; 
+		}
+		
+		board[x][y]=symbol;
+		count++;
+		
+		if(board[x][0]==board[x][1] && board[x][0]==board[x][2]) {
+			return symbol==p1symbol?PLAYER_1_WINS:PLAYER_2_WINS;
+		}
+		
+		if(board[0][y]==board[1][y] && board[0][y]==board[2][y]) {
+			return symbol==p1symbol?PLAYER_1_WINS:PLAYER_2_WINS;
+		}
+		
+		if(board[0][0]!=' '&&board[0][0]==board[1][1] && board[0][0]==board[2][2]) {
+			return symbol==p1symbol?PLAYER_1_WINS:PLAYER_2_WINS;
+		}
+		
+		if(board[0][2]!=' '&&board[0][2]==board[1][1] && board[0][2]==board[2][0]) {
+			return symbol==p1symbol?PLAYER_1_WINS:PLAYER_2_WINS;
+		}
+		if(count == boardSize*boardSize) {
+			return DRAW;
+		}
+		return INCOMPLETE;
+		
+	}
+	public void print() {
+		// TODO Auto-generated method stub
+		System.out.println("---------------");
+		for(int i=0;i<boardSize;i++) {
+			for(int j=0;j<boardSize;j++) {
+				System.out.print("| "+board[i][j]+" |");
+			}
+			System.out.println();
+		}
+		System.out.println();
+		System.out.println("---------------");
+
+		
+	}
+
+}
+#Player
+package TicTac;
+
+public class Player {
+	private String name;
+	private char symbol;
+	public Player(String name,char symbol) {
+		setname(name);
+		setsymbol(symbol);
+	}
+	void setname(String name) {
+		if(!name.isEmpty()) {
+			this.name=name;
+		}
+	}
+	void setsymbol(char symbol) {
+		if(symbol!='\0') {
+			this.symbol=symbol;
+		}
+	}
+	String getname() {
+		return this.name;
+	}
+	char getsymbol() {
+		return this.symbol;
+	}
+}
+#Tic-Tac-Toe
+package TicTac;
+
+import java.util.Scanner;
+
+public class TicTacToe {
+	private Player player1,player2;
+	private Board board;
+	public static void main(String[] args) {
+		TicTacToe t=new TicTacToe();
+		t.startGame();
+	}
+	public void startGame() {
+		Scanner sc=new Scanner(System.in);
+		//input player
+		player1=takeinput(1);
+		player2=takeinput(2);
+		while(player1.getsymbol()==player2.getsymbol()) {
+			System.out.println("Symbol Alraedy Taken !! Plaese take another Symbol");
+			char s=sc.next().charAt(0);
+			player2.setsymbol(s);
+		}
+		//create board 
+		Board board=new Board(player1.getsymbol(),player2.getsymbol());
+		//Conduct Game
+		boolean player1Turn=true;
+		int status=board.INCOMPLETE;
+		while(status==board.INCOMPLETE || status==board.INVALID) {
+			if(player1Turn) {
+				System.out.println("Player 1-"+player1.getname()+"'s move");
+				System.out.println("Enter x:");
+				int x=sc.nextInt();
+				System.out.println("Enter y:");
+				int y=sc.nextInt();
+				status =board.move(player1.getsymbol(),x,y);
+				if(status!=board.INVALID) {
+					player1Turn=false;
+					board.print();
+				}
+				else {
+			    	System.out.println("Invalid Move !! Plaeas Try Again");
+			    }
+			}else {
+				System.out.println("Player 2-"+player2.getname()+"'s move");
+				System.out.println("Enter x:");
+				int x=sc.nextInt();
+				System.out.println("Enter y:");
+				int y=sc.nextInt();
+				status =board.move(player2.getsymbol(),x,y);
+				if(status!=board.INVALID) {
+					player1Turn=true;
+					board.print();
+			    }else {
+			    	System.out.println("Invalid Move !! Plaeas Try Again");
+			    }
+	    	}
+		
+	     }
+		if(status==board.PLAYER_1_WINS){
+			System.out.println("Player 1 "+player1.getname()+" win's");
+		}
+		else if(status==board.PLAYER_2_WINS){
+			System.out.println("Player 2 "+player2.getname()+" win's");
+		}else {
+			System.out.println("DRAW");
+		}
+      }
+	private Player takeinput(int i) {
+		Scanner sc=new Scanner(System.in);
+		System.out.println("Enter player "+i+"Name");
+		String s=sc.nextLine();
+		System.out.println("Enter player "+i+"Symbol");
+		char c=sc.next().charAt(0);
+		Player p=new Player(s,c);
+		return p;
+	}
+
+}
+#Sample Output:
+Enter player 1Name
+Priya
+Enter player 1Symbol
+x
+Enter player 2Name
+Shyam
+Enter player 2Symbol
+O
+Player 1-Priya's move
+Enter x:
+0
+Enter y:
+0
+---------------
+| x ||   ||   |
+|   ||   ||   |
+|   ||   ||   |
+
+---------------
+Player 2-Shyam's move
+Enter x:
+1
+Enter y:
+3
+Invalid Move !! Plaeas Try Again
+Player 2-Shyam's move
+Enter x:
+0
+Enter y:
+2
+---------------
+| x ||   || O |
+|   ||   ||   |
+|   ||   ||   |
+
+---------------
+Player 1-Priya's move
+Enter x:
+1
+Enter y:
+1
+---------------
+| x ||   || O |
+|   || x ||   |
+|   ||   ||   |
+
+---------------
+Player 2-Shyam's move
+Enter x:
+2
+Enter y:
+2
+---------------
+| x ||   || O |
+|   || x ||   |
+|   ||   || O |
+
+---------------
+Player 1-Priya's move
+Enter x:
+0
+Enter y:
+2
+Invalid Move !! Plaeas Try Again
+Player 1-Priya's move
+Enter x:
+2
+Enter y:
+0
+---------------
+| x ||   || O |
+|   || x ||   |
+| x ||   || O |
+
+---------------
+Player 2-Shyam's move
+Enter x:
+0
+Enter y:
+1
+---------------
+| x || O || O |
+|   || x ||   |
+| x ||   || O |
+
+---------------
+Player 1-Priya's move
+Enter x:
+1
+Enter y:
+0
+---------------
+| x || O || O |
+| x || x ||   |
+| x ||   || O |
+
+---------------
+Player 1 Priya win's
